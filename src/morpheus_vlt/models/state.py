@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict
 
 
 @dataclass
@@ -15,8 +14,8 @@ class MachineState:
     and the way my bank account usually ends.
     """
 
-    counters: Dict[int, int] = field(default_factory=dict)  # id -> value
-    meters: Dict[str, int] = field(default_factory=dict)    # name -> value
+    counters: dict[int, int] = field(default_factory=dict)  # id -> value
+    meters: dict[str, int] = field(default_factory=dict)    # name -> value
 
     def get_counter(self, counter_id: int) -> int:
         """Return counter `counter_id`, or 0 if nobody ever set it."""

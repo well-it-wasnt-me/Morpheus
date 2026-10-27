@@ -33,7 +33,7 @@ jobs:
           push: true
 
   publish:
-    needs: [release, build]
+    needs: release
     runs-on: ubuntu-latest
     environment: pypi
     permissions:

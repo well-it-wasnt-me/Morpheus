@@ -16,12 +16,11 @@ The dance, from the reader's point of view:
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Iterable, List, Optional, Tuple
 
 from ..models.state import MachineState
-
 
 # Control bytes. The 1960s called, they want them back. Too bad.
 ENQ = b"\x05"
@@ -123,7 +122,7 @@ def _ensure_crlf(line: str) -> str:
     return line + "\r\n"
 
 
-def _split_lines(text: str) -> List[str]:
+def _split_lines(text: str) -> list[str]:
     if not text:
         return []
     lines = text.splitlines()
@@ -158,11 +157,11 @@ class DexSimulator:
     communication_id: bytes = DEFAULT_COMMUNICATION_ID
     revision_level: bytes = DEFAULT_REVISION_LEVEL
     response_code: bytes = DEFAULT_RESPONSE_CODE
-    evadts_lines: List[str] = field(default_factory=list)
+    evadts_lines: list[str] = field(default_factory=list)
 
     _rx: bytearray = field(default_factory=bytearray, init=False, repr=False)
     _state: DexState = field(default=DexState.WAIT_ENQ_FIRST, init=False, repr=False)
-    _blocks: List[bytes] = field(default_factory=list, init=False, repr=False)
+    _blocks: list[bytes] = field(default_factory=list, init=False, repr=False)
     _block_index: int = field(default=0, init=False, repr=False)
     _session_comm_id: bytes = field(default=DEFAULT_COMMUNICATION_ID, init=False, repr=False)
     _session_revision: bytes = field(default=DEFAULT_REVISION_LEVEL, init=False, repr=False)
@@ -195,7 +194,7 @@ class DexSimulator:
 
     def load_evadts_file(self, path: str) -> None:
         """Load the EVA-DTS payload from a text file. Bad bytes go out as '?', not as exceptions."""
-        with open(path, "r", encoding="utf-8", errors="replace") as f:
+        with open(path, encoding="utf-8", errors="replace") as f:
             text = f.read()
         self.load_evadts_lines(_split_lines(text))
 
@@ -336,7 +335,7 @@ class DexSimulator:
         Every block ends in ETB except the very last one, which ends in ETX. That's how the
         reader knows the file is over and it can stop pretending to be patient.
         """
-        blocks: List[bytes] = []
+        blocks: list[bytes] = []
         for line_index, line in enumerate(self.evadts_lines):
             data = line.encode("ascii", errors="replace")
             chunks = [data[i:i + MAX_BLOCK_DATA] for i in range(0, len(data), MAX_BLOCK_DATA)]
@@ -393,7 +392,7 @@ class DexSimulator:
 
     def _consume_ack(self, *, accept_ack0: bool = True, accept_ack1: bool = True) -> bool:
         """Eat the first acceptable ACK in the buffer. True if one was found."""
-        seqs: List[bytes] = []
+        seqs: list[bytes] = []
         if accept_ack0:
             seqs.append(ACK0)
         if accept_ack1:
@@ -403,9 +402,9 @@ class DexSimulator:
         found = self._consume_first_of(seqs)
         return found is not None
 
-    def _consume_ack_or_nak(self) -> Optional[str]:
+    def _consume_ack_or_nak(self) -> str | None:
         """Eat whichever of NAK, DLE0, DLE1 shows up first. Returns "ack", "nak", or None."""
-        candidates: List[Tuple[str, int, int]] = []
+        candidates: list[tuple[str, int, int]] = []
         nak_idx = self._rx.find(NAK)
         if nak_idx != -1:
             candidates.append(("nak", nak_idx, len(NAK)))
@@ -422,9 +421,9 @@ class DexSimulator:
         del self._rx[:idx + length]
         return kind
 
-    def _consume_first_of(self, seqs: Iterable[bytes]) -> Optional[bytes]:
+    def _consume_first_of(self, seqs: Iterable[bytes]) -> bytes | None:
         """Eat the earliest of `seqs` found in the buffer, plus everything before it."""
-        best: Optional[Tuple[int, bytes]] = None
+        best: tuple[int, bytes] | None = None
         for seq in seqs:
             idx = self._rx.find(seq)
             if idx == -1:
@@ -438,7 +437,7 @@ class DexSimulator:
         del self._rx[:idx + len(seq)]
         return seq
 
-    def _consume_handshake_request(self) -> Optional[Tuple[bytes, int]]:
+    def _consume_handshake_request(self) -> tuple[bytes, int] | None:
         """Pull one DLE SOH ... DLE ETX crc message off the buffer as (payload, received crc).
 
         Returns None until the whole thing, CRC included, has arrived, and keeps the partial

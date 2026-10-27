@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import socket
 import threading
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Optional
 
 import pytest
 
@@ -79,12 +79,12 @@ def morpheus_vlt_server(tmp_path_factory: pytest.TempPathFactory) -> Callable[..
         transport: str = "tcp",
         host: str = "127.0.0.1",
         port: int = 0,
-        tty_name: Optional[str] = None,
-        tty_path: Optional[str] = None,
-        vdai_type: Optional[str] = None,
+        tty_name: str | None = None,
+        tty_path: str | None = None,
+        vdai_type: str | None = None,
         sas_addr: int = 0x01,
-        chaos: Optional[ChaosProfile] = None,
-        state: Optional[MachineState] = None,
+        chaos: ChaosProfile | None = None,
+        state: MachineState | None = None,
     ) -> SimHandle:
         if state is None:
             state = MachineState()

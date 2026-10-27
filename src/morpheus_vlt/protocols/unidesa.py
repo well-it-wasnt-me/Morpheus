@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import List
 
 from ..core.framing import UnidesaMessage, build_unidesa_reply
 from ..models.state import MachineState
@@ -18,7 +17,7 @@ log = logging.getLogger(__name__)
 
 # The counter ids the reader scripts ask for, in the order they ask for them. Order matters:
 # `first`/`last` in a counters request are offsets into this list, not counter ids.
-DEFAULT_SELECTED_COUNTER_IDS: List[int] = [
+DEFAULT_SELECTED_COUNTER_IDS: list[int] = [
     1, 2, 17, 3, 31, 32, 33, 34, 154,
     4, 7, 8, 11, 12, 24, 35, 84, 97,
     160, 161, 162, 163, 130, 131, 132, 133,
@@ -51,7 +50,7 @@ class UnidesaSimulator:
 
     name: str = "unidesa"
     state: MachineState = field(default_factory=MachineState)
-    selected_counters: List[int] = field(default_factory=lambda: list(DEFAULT_SELECTED_COUNTER_IDS))
+    selected_counters: list[int] = field(default_factory=lambda: list(DEFAULT_SELECTED_COUNTER_IDS))
 
     # Reply addressing. The scripts scan replies for b"\x02\xff", so SD stays 0xFF. Don't touch it.
     reply_sd: int = 0xFF
@@ -73,7 +72,7 @@ class UnidesaSimulator:
         if msg.cmd == CMD_CUSTOM_SELECT:
             # Payload is (group, counter_id) pairs. The group gets read and ignored, same as my
             # emails. An odd trailing byte gets dropped. An empty list keeps the old selection.
-            ids: List[int] = []
+            ids: list[int] = []
             for i in range(0, len(msg.data), 2):
                 if i + 1 >= len(msg.data):
                     break

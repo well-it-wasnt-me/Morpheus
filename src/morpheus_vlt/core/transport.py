@@ -6,15 +6,15 @@ bytes go out. The dumbest possible design, which is why it works.
 
 from __future__ import annotations
 
+import contextlib
+import logging
 import os
 import select
 import socket
 import threading
 import tty
+from collections.abc import Callable
 from dataclasses import dataclass
-import logging
-from typing import Callable, Optional
-
 
 # Takes whatever bytes arrived, returns whatever should go back. Empty means "say nothing".
 BytesHandler = Callable[[bytes], bytes]
@@ -33,7 +33,7 @@ class ServerConfig:
 class PtyConfig:
     """PTY settings. `link_path` is the friendly symlink, `raw` turns off the tty's opinions."""
 
-    link_path: Optional[str] = None
+    link_path: str | None = None
     recv_buffer: int = 4096
     raw: bool = True
 
@@ -49,7 +49,7 @@ class TCPByteServer:
     def __init__(self, cfg: ServerConfig, handler: BytesHandler) -> None:
         self.cfg = cfg
         self.handler = handler
-        self._sock: Optional[socket.socket] = None
+        self._sock: socket.socket | None = None
         self._stop = threading.Event()
         # Set once the socket is listening. Wait on it before connecting, or enjoy the race.
         self.ready = threading.Event()
@@ -75,10 +75,8 @@ class TCPByteServer:
         """Close the listening socket. Clients already connected finish their current request."""
         self._stop.set()
         if self._sock:
-            try:
+            with contextlib.suppress(OSError):
                 self._sock.close()
-            except OSError:
-                pass
 
     def _serve_client(self, conn: socket.socket) -> None:
         """Feed one client's bytes to the handler until the client hangs up."""
@@ -109,10 +107,10 @@ class PtyByteServer:
         self._stop = threading.Event()
         # Set once the PTY exists and the symlink points at it. Open the device after that, not before.
         self.ready = threading.Event()
-        self._master_fd: Optional[int] = None
-        self._slave_fd: Optional[int] = None
-        self._link_path: Optional[str] = None
-        self.slave_name: Optional[str] = None
+        self._master_fd: int | None = None
+        self._slave_fd: int | None = None
+        self._link_path: str | None = None
+        self.slave_name: str | None = None
 
     def start(self) -> None:
         """Open the PTY, make the symlink, then pump bytes until `stop`. Blocks, like its cousin."""
@@ -161,22 +159,16 @@ class PtyByteServer:
         """Close both PTY ends, remove the symlink. Leave the campsite cleaner than you found it."""
         self._stop.set()
         if self._master_fd is not None:
-            try:
+            with contextlib.suppress(OSError):
                 os.close(self._master_fd)
-            except OSError:
-                pass
             self._master_fd = None
         if self._slave_fd is not None:
-            try:
+            with contextlib.suppress(OSError):
                 os.close(self._slave_fd)
-            except OSError:
-                pass
             self._slave_fd = None
         if self._link_path:
-            try:
+            with contextlib.suppress(OSError):
                 os.unlink(self._link_path)
-            except OSError:
-                pass
             self._link_path = None
 
     @staticmethod

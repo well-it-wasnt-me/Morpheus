@@ -1,8 +1,9 @@
-from morpheus_vlt.core.transport import PtyByteServer, PtyConfig
 import threading
 import time
 
 import pytest
+
+from morpheus_vlt.core.transport import PtyByteServer, PtyConfig
 
 serial = pytest.importorskip("serial")
 

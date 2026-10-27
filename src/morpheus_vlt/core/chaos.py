@@ -10,7 +10,6 @@ import os
 import random
 import time
 from dataclasses import dataclass
-from typing import List, Optional
 
 
 @dataclass
@@ -33,7 +32,7 @@ class ChaosProfile:
     delay_ms_min: int = 0
     delay_ms_max: int = 0
 
-    seed: Optional[int] = None
+    seed: int | None = None
 
     def __post_init__(self) -> None:
         if self.seed is None:
@@ -42,7 +41,7 @@ class ChaosProfile:
         if self.seed is not None:
             random.seed(self.seed)
 
-    def apply(self, payload: bytes) -> List[bytes]:
+    def apply(self, payload: bytes) -> list[bytes]:
         """Mess with `payload` and return 0, 1 or 2 copies of whatever survived.
 
         The order is: drop (game over, empty list), corrupt one byte, flip one bit, sleep, then

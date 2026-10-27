@@ -37,5 +37,26 @@ show_missing = true
 skip_covered = false
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py310"
+
+[tool.ruff.lint]
+# The rules are spelled out on purpose. Ruff's default set changes between releases, CI installs the newest
+# one, and that's how lint went red once without a single line of code changing.
+select = [
+    "E",    # pycodestyle errors, the 120 column limit included
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # import order
+    "UP",   # pyupgrade, keeps the syntax at 3.10
+    "B",    # bugbear
+    "SIM",  # simplify
+    "C4",   # comprehensions
+    "RUF",  # ruff's own, unused noqa comments included
+]
+# A ternary can't hold a comment, and both if/else blocks it wants to squash have one.
+ignore = ["SIM108"]
+
+[tool.ruff.lint.per-file-ignores]
+# The parser in here is oblivion's, copied on purpose, warts and all. Lint my code, not theirs.
+"tests/test_vdai.py" = ["B905", "RUF005"]

@@ -7,8 +7,8 @@ security. Eight bytes of overhead, ND bytes of payload, zero bytes of mercy.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 
 def xor55_checksum(buf: bytes) -> int:
@@ -34,7 +34,7 @@ class UnidesaMessage:
     ext: int
 
     @classmethod
-    def parse(cls, raw: bytes) -> "UnidesaMessage":
+    def parse(cls, raw: bytes) -> UnidesaMessage:
         """Slice `raw` into fields. Doesn't check anything yet, that's what `validate` is for."""
         if len(raw) < 8:
             raise ValueError("frame too short")

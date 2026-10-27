@@ -43,6 +43,18 @@ ruff check src tests
 Target coverage is 90%+. Tests go under `tests/` as `test_*.py`. CI runs them on Python 3.10, 3.11 and 3.12,
 then runs ruff. If it's red, it's red. It's not "flaky".
 
+The ruff rules live in `[tool.ruff.lint]` in `pyproject.toml`, listed one by one: pycodestyle, pyflakes, import
+order, pyupgrade, bugbear, simplify, comprehensions and ruff's own. Don't delete the list to "use the defaults".
+CI installs whatever ruff is newest, ruff changes its defaults between releases, and you get a red build for
+code nobody touched. Ask me how I know.
+
+Two exceptions are on purpose:
+
+- `SIM108` is off. It wants every if/else turned into a ternary, including the ones with a comment in a branch,
+  and a ternary has nowhere to put the comment.
+- `tests/test_vdai.py` skips `B905` and `RUF005`. Its parser is copied from oblivion, warts included, so the
+  tests read pages exactly the way the reader does.
+
 The PTY tests need Linux or macOS. The pyserial test skips itself if pyserial isn't installed.
 
 `tests/conftest.py` loads the pytest plugin when the package isn't installed, so the fixture works from a bare
@@ -92,7 +104,7 @@ and still precise about the technical facts. Think a comedian with twenty years 
 - ASCII only. `->` instead of arrows, straight quotes, `...` instead of the ellipsis character.
 - No em dashes, and no ` -- ` standing in for one. CLI flags are fine.
 - Don't string clauses together with semicolons. Split them into sentences.
-- 120 characters per line at most.
+- 120 characters per line at most. Ruff enforces it on the Python. The Markdown is on the honor system.
 - The joke never gets to make the fact wrong. If it's funny and inaccurate, it's just inaccurate.
 
 ## Adding a protocol

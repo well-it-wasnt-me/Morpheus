@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 
 from ..models.state import MachineState
 
-
 # (label printed on the line, meter it reads). The labels have dots where the legacy reader regex
 # has wildcards. Don't "fix" them into real words, the regex is the boss here.
 TOTALS_LAYOUT: tuple[tuple[str, str], ...] = (
@@ -188,10 +187,7 @@ class RFrancoSimulator:
         del self._rx[: pos + 1]
 
         # Eat the other half of a two-byte line ending so it doesn't count as an empty line.
-        if self._rx:
-            if terminator == 0x0D and self._rx[0] == 0x0A:
-                del self._rx[0]
-            elif terminator == 0x0A and self._rx[0] == 0x0D:
-                del self._rx[0]
+        if self._rx and self._rx[0] in (0x0A, 0x0D) and self._rx[0] != terminator:
+            del self._rx[0]
 
         return line

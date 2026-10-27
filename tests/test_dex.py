@@ -1,5 +1,4 @@
 from morpheus_vlt.protocols.dex import (
-    DexSimulator,
     ACK0,
     ACK1,
     DLE_ETB,
@@ -11,6 +10,7 @@ from morpheus_vlt.protocols.dex import (
     ETX,
     MAX_HANDSHAKE_BYTES,
     NAK,
+    DexSimulator,
     dex_crc16_bytes,
 )
 

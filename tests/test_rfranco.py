@@ -2,7 +2,6 @@ import re
 
 from morpheus_vlt.protocols.rfranco import REGISTROS_LAYOUT, RFrancoSimulator
 
-
 REX_TOT = rb"^total\.[\.e,\.s,pa]"
 REX_REG = rb"^(mo\.[e,s]|bil[le,ls,ho]|partid\.a\.[1,2,3])"
 

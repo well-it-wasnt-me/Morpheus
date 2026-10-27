@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Optional, Protocol
+from typing import Protocol
 
 from .chaos import ChaosProfile
 from .framing import split_unidesa_frames
@@ -28,7 +28,7 @@ class Simulator:
     """Ask the protocol for a reply, then let chaos ruin it if chaos is enabled."""
 
     protocol: ProtocolSimulator
-    chaos: Optional[ChaosProfile] = None
+    chaos: ChaosProfile | None = None
 
     def handle(self, data: bytes) -> bytes:
         """Return the protocol's reply, possibly dropped, mangled, delayed or sent twice.
