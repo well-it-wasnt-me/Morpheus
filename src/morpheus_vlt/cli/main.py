@@ -26,7 +26,7 @@ def _load_state(path: str | None) -> MachineState:
     """
     if not path:
         return MachineState()
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         obj = json.load(f)
     st = MachineState()
     for k, v in obj.get("meters", {}).items():
