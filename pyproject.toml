@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "morpheus-vlt"
+version = "0.1.0"
+description = "VLT protocol simulators (Unidesa/Cirsa, SAS, VDAI, RFranco, DEX/UCS) with chaos testing"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "AGPL-3.0-or-later"
+dependencies = ["pyserial>=3.5"]
+
+[project.scripts]
+morpheus-vlt = "morpheus_vlt.cli.main:main"
+
+[project.entry-points.pytest11]
+morpheus_vlt = "morpheus_vlt.pytest_plugin"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "--strict-markers"
+
+[tool.coverage.run]
+branch = true
+source = ["src/morpheus_vlt"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
